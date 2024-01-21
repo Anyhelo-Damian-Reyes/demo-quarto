@@ -1,0 +1,4 @@
+"0","datos_clean %>% "
+"0","  filter(male==0 & death==1 & phq9>=10) %>% "
+"0","  select(age,phq9,sbp,depre,e_gfr_kdigo) %>% "
+"0","  arrange(age)"

@@ -1,0 +1,6 @@
+"0","datos_clean %>% "
+"0","  mutate(et_hf = recode(et_hf, ""1"" = ""Yes"", ""0"" = ""No""), #anti - nuevo"
+"0","         el_bnp_nt  = recode(el_bnp_nt , ""1"" = ""Yes"", ""0"" = ""No""),"
+"0","         death  = recode(death , ""1"" = ""Yes"", ""0"" = ""No""),"
+"0","         hospi  = recode(hospi, ""1"" = ""Yes"", ""0"" = ""No"")"
+"0","         ) -> datos_clean"

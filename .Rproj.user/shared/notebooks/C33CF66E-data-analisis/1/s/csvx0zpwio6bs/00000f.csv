@@ -1,0 +1,21 @@
+"0","datos_crudos %>% skim()"
+"1","── Data Summary ────────────────────────
+"
+"1","                           Values    
+"
+"1","Name                       Piped data
+"
+"1","Number of rows             428       
+"
+"1","Number of columns          16        
+"
+"1","_______________________              
+"
+"1","Column type frequency:               
+"
+"1","  numeric                  16        
+"
+"1","________________________             
+"
+"1","Group variables            None      
+"

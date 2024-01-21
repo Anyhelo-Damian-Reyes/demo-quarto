@@ -1,0 +1,7 @@
+"0","datos_clean %>% "
+"0","  mutate("
+"0","    depre = case_when(phq9 > 5 ~ ""With depressive symptoms"","
+"0","                      phq9 <= 5 ~ ""Without depressive symptoms"","
+"0","                      TRUE~as.character(NA)"
+"0","                      )"
+"0","  )-> datos_clean"

@@ -1,0 +1,356 @@
+---
+title: "Curso R Aplicado a los Proyectos de Investigación"
+subtitle: "Problem Set 1"
+date: today # other options: now, last-modified
+author:
+  - name: Anyhelo C. Damian Reyes
+    affiliation: Universidad Nacional Pedro Ruiz Gallo
+#title-block-banner: true
+title-block-banner: "#245756"
+---
+
+## Introducción
+
+Para este problem set 1, procesaremos los datos del artículo titulado **"Comorbid Depression and Heart Failure: A Community Cohort Study"** y publicado en la revista Plos One (doi: <https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0158570>).
+
+Hemos modificado ligeramente los datos originales para agregarles algunos problemas que permitan enfrentar problemas de calidad de datos.
+
+En este problem set 1 nos centraremos solo en manejo de datos y análisis inicial de datos incluyendo gráficos. Todos los ejercicios requieren que usted haga algún tipo de comentario personal, ya sea describir los resultados observados o comentar el proceso / razonamiento seguido.
+
+::: callout-warning
+Es importante que se respondan con comentarios, no solo código! La pregunta que no tiene comentarios solo valdrá 25% del puntaje total.
+:::
+
+## Entregable
+
+Use la plantilla denominada: **Problem_Set1_ApellidoPaterno_ApellidoMaterno_Nombre.qmd** ubicada en la carpeta compartida [Enlace aquí](https://drive.google.com/drive/folders/1yamc85FZ91IGSzqNJyNLndfJgh61SgZw).
+
+Deberá enviar al siguiente correo electrónico [percys1991\@gmail.com](mailto:percys1991@gmail.com){.email} una carpeta comprimida o compartida por Drive / Onedrive /Dropbox con los siguientes archivos:
+
+## Ejercicios
+
+### Ejercicio 1:
+
+Cargue los paquetes que usará. Comentar con \# al lado de cada paquete un
+resumen breve de para qué lo usarán. **Tip: Use library()**
+
+*Nota: Todos los paquetes que usará deberán estar en este chunk, no en otro chunk posterior*
+
+```{r setup, include=FALSE}
+library(rio)  # Navaja suiza de la importación de datos
+library(skimr)  # Análisis inicial de datos
+library(ggplot2) # Varias funciones de tidyverse (dplyr, ggplot2, etc.)
+library(Hmisc)
+library(dplyr)
+library(tidyverse)
+library(visdat) #datos perdidos
+library(VIM) # datos perdidos
+library(naniar) # datos perdidos
+library(janitor) #identifica filas duplicados
+```
+
+### Ejercicio 2:
+
+Importe los datos denominados `"pone.0158570.s002_modified.xlsx"` que se encuentran en la carpeta compartida [Enlace aquí](https://drive.google.com/drive/folders/1yamc85FZ91IGSzqNJyNLndfJgh61SgZw). Llame a los datos importados: "datos_crudos".
+
+```{r importando}
+datos_crudos <- import("pone_0158570_s002_modified.xlsx") 
+```
+
+### Ejercicio 3:
+
+Haga un inspección global de los datos
+
+-   **Dé un vistazo a los datos. Describa brevemente sus resultados.**
+
+```{r inspección global}
+#datos_crudos  %>%  characterize()
+#head(datos_crudos)
+datos_crudos %>% glimpse()
+```
+
+-   **Obtenga un resumen global superficial de los datos. Describa brevemente sus resultados.**
+
+```{r}
+datos_crudos %>% skim()
+
+```
+
+-   **Obtenga una descripción un poco más detallada variable por variable de los datos. Describa brevementesus resultados.**
+
+```{r}
+#datos_crudos %>% describe()
+
+```
+
+### Ejercicio 4:
+
+Procese los datos según el siguiente diccionario:
+
+-   En un solo pipeline, haga lo siguiente:
+
+    -   
+
+        (1) Renombre variables.
+
+    -   
+
+        (2) Recodifique las etiquetas de las variables categóricas.
+
+    -   
+
+        (3) Cree las nuevas variables.
+
+    -   
+
+        (4) Etiquete a las variables.
+
+```{r procesamiento}
+datos_crudos %>% 
+  rename(
+    age = "Age (years)",
+    male = "Male (1=Yes, 0=No)",
+    phq9 = "PHQ-9",
+    sbp = "Systolic BP (mm Hg)",
+    e_gfr = "Estimated glomerular filtration rate",
+    ej_frac = "Ejection fraction (%)",
+    sod = "Serum sodium (mmol/l)",
+    bun = "Blood urea nitrogen (mg/dl)",
+    et_hf = "Etiology HF(1=Yes, 0=No)",
+    dm = "Prior diabetes mellitus",
+    el_bnp_nt = "Elevated level of BNP/NT-BNP (1=Yes, 0=No)",
+    t_hf_death = "Time from HF to Death (days)",
+    death = "Death (1=Yes, 0=No)",
+    t_hf_hospi = "Time from HF to hospitalization (days)",
+    hospi = "Hospitalized (1=Yes, 0=No)"
+  ) -> datos_clean
+```
+```{r}
+datos_clean %>% 
+  mutate(et_hf = recode(et_hf, "1" = "Yes", "0" = "No"), #anti - nuevo
+         el_bnp_nt  = recode(el_bnp_nt , "1" = "Yes", "0" = "No"),
+         death  = recode(death , "1" = "Yes", "0" = "No"),
+         hospi  = recode(hospi, "1" = "Yes", "0" = "No")
+         ) -> datos_clean
+```
+
+Asignar "With/Without depressive symptoms" a la variable **phq9**
+
+```{r}
+datos_clean %>% 
+  mutate(
+    depre = case_when(phq9 > 5 ~ "With depressive symptoms",
+                      phq9 <= 5 ~ "Without depressive symptoms",
+                      TRUE~as.character(NA)
+                      )
+  )-> datos_clean
+```
+
+Convertir **ej_frac** a fraccion
+
+```{r}
+datos_clean %>% 
+  mutate(ej_frac_prop = ej_frac/100
+  )-> datos_clean
+```
+
+```{r}
+datos_clean %>% 
+  mutate(
+    e_gfr_kdigo = case_when(e_gfr >= 90 ~ "G1-Normal or hight ",
+                            e_gfr >=60 & e_gfr<90 ~ "G2-Midly decraesed",
+                            e_gfr >=45 & e_gfr<60 ~ "G3a-Midly to moderately decraesed",
+                            e_gfr >=30 & e_gfr<45 ~ "G3b-Moderately to severely decraesed",
+                            e_gfr >=15 & e_gfr<30 ~ "G4-Severely decraesed",
+                            e_gfr < 15 ~ "G5-Kidney failure",
+                            TRUE~as.character(NA)
+                      )
+  )-> datos_clean
+```
+
+### Ejercicio 5:
+
+Identifique duplicados
+
+-   **Identifique duplicados de fila. Describa brevemente sus resultados.**
+
+```{r duplicados}
+datos_clean %>% get_dupes()
+```
+
+-   **Identifique duplicados de id. Describa brevemente sus resultados.**
+
+```{r}
+datos_clean %>% get_dupes(id)
+
+```
+
+-   **Solo si hubo duplicados de fila, elimine los duplicados de fila, quedándose solo con una versión de cada observación. Comente el proceso/razonamiento.**
+
+*Tip: Puedes usar distinct()*
+
+```{r}
+datos_clean <- distinct(datos_clean)
+datos_clean %>% get_dupes()
+```
+
+-   **Solo si hubo duplicados de id, elimine el duplicado de fila que menos información completa tenga. Comente el proceso/razonamiento.**
+
+*Tip: Puedes usar slice() o filter()*
+
+```{r}
+datos_clean %>% get_dupes(id)
+
+datos_clean %>%
+  distinct(id,.keep_all = TRUE) -> datos_clean
+
+datos_clean %>% get_dupes(id)
+```
+
+### Ejercicio 6:
+
+Identifique datos perdidos
+
+-   **Presente el número de datos perdidos y tasa de completitud variable por variable en una sola salida. Describa los resultados relacionados a datos perdidos.**
+
+```{r datos perdidos}
+datos_clean %>% vis_dat()
+
+```
+
+-   **Muestre gráficos de datos perdidos y como se agrupan entre variables.Describa los resultados relacionados a datos perdidos.**
+
+```{r}
+
+datos_clean %>% vis_miss()
+
+```
+
+```{r}
+#paquete VIM
+datos_clean %>% aggr(numbers=TRUE)
+
+```
+
+```{r}
+#paquete naniar
+
+datos_clean %>% gg_miss_upset()
+```
+
+### Ejercicio 7:
+
+Haga las siguientes consultas ("queries") con los datos limpios (renombrados, etiquetados y sin duplicados)
+
+-   **Seleccione las variables id, age y phq-9. Muestre los participantes que tienen edades entre 50 y 55 años**
+
+```{r Queries}
+datos_clean %>% 
+  filter(age >= 50 & age <= 55) %>% 
+  select(id, phq9,age) %>% 
+  arrange(age)
+
+```
+
+-   **Seleccione las variables id, ej_Frac, sod, bun y et_hf. Luego, muestre a los participantes que tiene etiología isquémica.**
+
+```{r}
+datos_clean %>% 
+  filter(et_hf==1) %>% 
+  select(id, ej_frac,sod,bun,et_hf)
+  #arrange(age)
+  
+```
+
+-   **¿Quiénes fueron los pacientes mujeres que sobrevivieron y tuvieron un phq-9 \> 10?**
+
+```{r}
+datos_clean %>% 
+  filter(male==0 & death==1 & phq9>=10) %>% 
+  select(age,phq9,sbp,depre,e_gfr_kdigo) %>% 
+  arrange(age)
+
+```
+
+-   **¿Cuáles fueron los valores de tiempo a muerte en los pacientes varones que murieron, que tuvieron etiología isquémica y un puntaje de phq-9 \> 10?**
+
+```{r}
+datos_clean %>% 
+  filter(male==1 & et_hf==1 & phq9>=10) %>% 
+  select(t_hf_death,age,phq9,sbp,depre,e_gfr_kdigo) %>% 
+  arrange(t_hf_death)
+
+```
+
+### Ejercicio 8:
+
+Haga los siguientes gráficos:
+
+-   **Mediante un gráfico de cajas, compare los valores de ejection fraction (%) entre los pacientes con etiología isquémica versus sin etiología isquémica. Muestre el resultado más simple posible.**
+
+```{r gráficos}
+ggplot(datos_clean, 
+       aes(x = et_hf , 
+           y = ej_frac,
+           fill=et_hf)) +
+  geom_boxplot(position = "dodge", color = "black") +
+  geom_jitter(alpha = 0.5, color = "blue")+
+  
+  labs(title = "Comparación de ejection fraction entre etiologías",
+       x = "Etiología",
+       y = "Ejection Fraction (%)")
+
+```
+
+
+-   **Mediante un gráfico de cajas, compare los valores de ejection fraction (%) entre los pacientes con etiología isquémica versus sin etiología isquémica. Muestre el resultado más elaborado posible: Elija un tema de su agrado, agregue etiquetas (título general, título de eje X, título de eje Y, etiquetas de leyenda si aplica), modifique la escala de colores, etc.**
+
+```{r}
+ggplot(datos_clean, 
+       aes(x = et_hf , 
+           y = ej_frac,
+           fill=et_hf)) +
+  geom_boxplot(position = "dodge", color = "black") +
+  #geom_jitter(alpha = 0.5, color = "blue")+
+  
+  labs(title = "Comparación de ejection fraction entre etiologías",
+       x = "Etiología",
+       y = "Ejection Fraction (%)")
+
+```
+
+-   **Use un gráfico de cajas y puntos dispersos (combinelos), para mostrar el nivel de bun según sexo. Muestre el resultado más simple posible.**
+
+*Tip: use geom_jitter() para los puntos dispersos. Más info aquí: <https://ggplot2.tidyverse.org/reference/geom_jitter.html>*
+
+```{r}
+
+
+```
+
+-   **Use un gráfico de cajas y puntos (combinelos), para mostrar el nivel de bun según sexo. Muestre el resultado más elaborado posible: Elija un tema de su agrado, agregue etiquetas (título general, título de eje X, título de eje Y, etiquetas de leyenda si aplica), modifique la escala de colores, etc.**
+
+*Tip: use geom_jitter() para los puntos dispersos. Más info aquí: <https://ggplot2.tidyverse.org/reference/geom_jitter.html>*
+
+```{r}
+
+
+```
+
+### Ejercicio 9:
+
+Exporte los datos a los siguientes formatos. Llame a los datos exportados: "datos_limpios"
+
+-   Formato de Excel: ".xlsx"
+
+```{r}
+
+
+```
+
+-   Formato de archivo plano: ".csv"
+
+```{r}
+
+
+```

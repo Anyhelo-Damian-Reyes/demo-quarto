@@ -1,0 +1,30 @@
+"0","#datos_crudos  %>%  characterize()"
+"0","#head(datos_crudos)"
+"0","datos_crudos %>% glimpse()"
+"1","Rows: 428"
+"1",""
+"1","
+"
+"1","Columns: 16"
+"1",""
+"1","
+"
+"1","$ id                                           [3m[38;5;246m<dbl>[39m[23m 11, 12, 13, 15, 16, 18, 19, 2…
+$ `Age (years)`                                [3m[38;5;246m<dbl>[39m[23m 93, 99, 83, 86, 84, 85, 85, 8…
+$ `Male (1=Yes, 0=No)`                         [3m[38;5;246m<dbl>[39m[23m 0, 1, 1, 1, 1, 0, 1, 0, 1, 1,…
+$ `PHQ-9`                                      [3m[38;5;246m<dbl>[39m[23m 1, 8, 4, 4, 3, 3, 2, 0, 3, 0,…
+$ `Systolic BP (mm Hg)`                        [3m[38;5;246m<dbl>[39m[23m 145, 115, 121, 113, 142, 96, …
+$ `Estimated glomerular filtration rate`       [3m[38;5;246m<dbl>[39m[23m 46.35246, 32.82785, 57.82159,…
+$ `Ejection fraction (%)`                      [3m[38;5;246m<dbl>[39m[23m 60.50000, 65.00000, 65.00000,…
+$ `Serum sodium (mmol/l)`                      [3m[38;5;246m<dbl>[39m[23m 137, 140, 141, 141, 137, 145,…
+$ `Blood urea nitrogen (mg/dl)`                [3m[38;5;246m<dbl>[39m[23m 26, 75, 28, 47, 32, 44, 49, 2…
+$ `Etiology HF(1=Yes, 0=No)`                   [3m[38;5;246m<dbl>[39m[23m 1, 1, 0, 0, 0, 1, 1, 0, 0, 0,…
+$ `Prior diabetes mellitus`                    [3m[38;5;246m<dbl>[39m[23m 1, 0, 0, 1, 1, 0, 0, 0, 0, 1,…
+$ `Elevated level of BNP/NT-BNP (1=Yes, 0=No)` [3m[38;5;246m<dbl>[39m[23m 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,…
+$ `Time from HF to Death (days)`               [3m[38;5;246m<dbl>[39m[23m 679, 74, 730, 730, 730, 40, 5…
+$ `Death (1=Yes, 0=No)`                        [3m[38;5;246m<dbl>[39m[23m 1, 1, 0, 0, 0, 1, 1, 0, 0, 0,…
+$ `Time from HF to hospitalization (days)`     [3m[38;5;246m<dbl>[39m[23m 134, 74, 224, 5, 730, 8, 11, …
+$ `Hospitalized (1=Yes, 0=No)`                 [3m[38;5;246m<dbl>[39m[23m 1, 0, 1, 1, 0, 1, 1, 1, 1, 1,…"
+"1",""
+"1","
+"

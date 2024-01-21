@@ -1,0 +1,3 @@
+"0","datos_clean %>% "
+"0","  filter(et_hf==1) %>% "
+"0","  select(id, ej_frac,sod,bun,et_hf)"

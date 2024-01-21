@@ -1,0 +1,4 @@
+"0","datos_clean %>% "
+"0","  filter(age >= 50 & age <= 55) %>% "
+"0","  select(id, phq9,age) %>% "
+"0","  arrange(age)"

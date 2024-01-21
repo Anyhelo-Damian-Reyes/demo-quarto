@@ -1,0 +1,3 @@
+"0","datos_clean %>% "
+"0","  mutate(ej_frac_prop = ej_frac/100"
+"0","  )-> datos_clean"
